@@ -1,0 +1,21 @@
+{
+  "split": "test",
+  "examples": [
+    {
+      "text": "Elon Musk founded SpaceX in Hawthorne, California.",
+      "entities": [
+        {"text": "Elon Musk", "label": "PERSON", "start": 0, "end": 9},
+        {"text": "SpaceX", "label": "ORGANIZATION", "start": 18, "end": 24},
+        {"text": "Hawthorne", "label": "LOCATION", "start": 28, "end": 37},
+        {"text": "California", "label": "LOCATION", "start": 39, "end": 49}
+      ]
+    },
+    {
+      "text": "The 2024 Olympic Games were held in Paris.",
+      "entities": [
+        {"text": "2024 Olympic Games", "label": "EVENT", "start": 4, "end": 22},
+        {"text": "Paris", "label": "LOCATION", "start": 35, "end": 40}
+      ]
+    }
+  ]
+}

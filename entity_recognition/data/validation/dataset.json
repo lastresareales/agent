@@ -1,0 +1,22 @@
+{
+  "split": "validation",
+  "examples": [
+    {
+      "text": "Microsoft was founded by Bill Gates in Seattle, Washington.",
+      "entities": [
+        {"text": "Microsoft", "label": "ORGANIZATION", "start": 0, "end": 9},
+        {"text": "Bill Gates", "label": "PERSON", "start": 24, "end": 34},
+        {"text": "Seattle", "label": "LOCATION", "start": 38, "end": 45},
+        {"text": "Washington", "label": "LOCATION", "start": 47, "end": 57}
+      ]
+    },
+    {
+      "text": "The iPhone was introduced by Apple in January 2007.",
+      "entities": [
+        {"text": "iPhone", "label": "PRODUCT", "start": 4, "end": 10},
+        {"text": "Apple", "label": "ORGANIZATION", "start": 28, "end": 33},
+        {"text": "January 2007", "label": "DATE", "start": 37, "end": 49}
+      ]
+    }
+  ]
+}

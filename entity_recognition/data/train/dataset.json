@@ -1,0 +1,29 @@
+{
+  "split": "train",
+  "examples": [
+    {
+      "text": "Apple Inc. was founded by Steve Jobs in Cupertino.",
+      "entities": [
+        {"text": "Apple Inc.", "label": "ORGANIZATION", "start": 0, "end": 10},
+        {"text": "Steve Jobs", "label": "PERSON", "start": 25, "end": 35},
+        {"text": "Cupertino", "label": "LOCATION", "start": 39, "end": 48}
+      ]
+    },
+    {
+      "text": "The Eiffel Tower is located in Paris, France.",
+      "entities": [
+        {"text": "Eiffel Tower", "label": "LOCATION", "start": 4, "end": 16},
+        {"text": "Paris", "label": "LOCATION", "start": 30, "end": 35},
+        {"text": "France", "label": "LOCATION", "start": 37, "end": 43}
+      ]
+    },
+    {
+      "text": "NASA launched the Artemis I mission in November 2022.",
+      "entities": [
+        {"text": "NASA", "label": "ORGANIZATION", "start": 0, "end": 4},
+        {"text": "Artemis I", "label": "EVENT", "start": 18, "end": 27},
+        {"text": "November 2022", "label": "DATE", "start": 38, "end": 51}
+      ]
+    }
+  ]
+}
