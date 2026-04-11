@@ -1,13 +1,18 @@
-{
-  "entities": {
-    "PERSON": [" ", " "],
-    "ORGANIZATION": [" ", " "]
-  },
-  "text_data_test": [
-    {"entity_name": "Person1", "text": " "},
-    {"entity_name": "Person2", "text": " "}
-  ],
-  "labels": {
-    "PERSON": [1, 0]
-  }
-}
+[
+    {
+        "tokens": ["Spokane", "Falls", "Community", "College", "starts", "classes", "in", "September", "."],
+        "ner_tags": [5, 6, 6, 6, 0, 0, 0, 0, 0]
+    },
+    {
+        "tokens": ["The", "CompTIA", "Security+", "exam", "tests", "network", "vulnerabilities", "."],
+        "ner_tags": [0, 5, 1, 0, 0, 0, 0, 0]
+    },
+    {
+        "tokens": ["Linus", "Torvalds", "created", "the", "Linux", "kernel", "."],
+        "ner_tags": [3, 4, 0, 0, 1, 0, 0]
+    },
+    {
+        "tokens": ["Google", "is", "headquartered", "in", "Mountain", "View", ",", "California", "."],
+        "ner_tags": [5, 0, 0, 0, 7, 8, 0, 7, 0]
+    }
+]
