@@ -9,7 +9,7 @@ class EntityRecognition:
     # Load a pre-trained model and fine-tune it for our specific task
     def load_model(self):
         # Here you would put your code to load a pre-trained model
-        if self.model_name == "bert-base-uncased":
+        if self.model_name == "bert-large-uncased":
             model = 
 AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=8)
             tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
@@ -28,5 +28,7 @@ AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labe
         outputs = self.model(**inputs)
 
         # Use the output to make predictions on the input text
-        predictions = torch.argmax(outputs.last_hidden_state[:, 0, :], dim=1)
-        return predictions.item()
+        logits = torch.softmax(outputs.last_hidden_state[:, 0, :], dim=1)
+        predicted_class = torch.argmax(logits, dim=1)
+
+        return predicted_class.item()
