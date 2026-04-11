@@ -6,7 +6,7 @@ from torch.optim import AdamW
 
 # Import our custom modules
 # (Assuming config.py has TRAIN_DATA_PATH, MODEL_NAME, BATCH_SIZE, LEARNING_RATE, EPOCHS)
-from config import TRAIN_DATA_PATH, MODEL_NAME, BATCH_SIZE, LEARNING_RATE, EPOCHS
+from config import TRAIN_DATA_PATH, MODEL_NAME, BATCH_SIZE, LEARNING_RATE, EPOCHS, SAVED_MODEL_PATH
 from entity_dataset import NERDataset
 from model import EntityRecognitionModel
 
@@ -41,11 +41,17 @@ def main():
             average_loss = total_loss / len(dataloader)
             print(f"Epoch {epoch + 1}/{EPOCHS} complete. Average Loss: {average_loss:.4f}")
 
+        # 5. Save the fine-tuned model and tokenizer
+        print(f"Saving model to '{SAVED_MODEL_PATH}'...")
+        ner_system.model.save_pretrained(SAVED_MODEL_PATH)
+        ner_system.tokenizer.save_pretrained(SAVED_MODEL_PATH)
+        print("Model saved successfully.")
+
     except FileNotFoundError:
         print(f"\n[!] Warning: Could not find '{TRAIN_DATA_PATH}'. Skipping training loop.")
         print("[!] Please create your dataset.json to run full training.\n")
 
-    # 5. Run an extraction test (Inference)
+    # 6. Run an extraction test (Inference)
     print("--- Running Inference Test ---")
     test_sentence = "Linus Torvalds created Linux in Helsinki."
     print(f"Input: {test_sentence}")
@@ -54,8 +60,8 @@ def main():
     results = ner_system.extract(test_sentence)
     
     # Print the results cleanly
-    for token, label in results:
-        print(f"{token:15} : {label}")
+    for entity in results:
+        print(entity)
 
 # This ensures the script only runs if executed directly, 
 # not if it is accidentally imported by another file.

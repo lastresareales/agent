@@ -31,3 +31,6 @@ BATCH_SIZE = 2
 
 # Maximum length of a tokenized sentence. Sentences longer than this will be truncated.
 MAX_SEQ_LENGTH = 128
+
+# Path where the fine-tuned model weights will be saved after training.
+SAVED_MODEL_PATH = os.path.join(BASE_DIR, "saved_model")
