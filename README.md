@@ -1,111 +1,46 @@
-**Entity Recognition Project**
+# Named Entity Recognition (NER) & Knowledge Graph Pipeline
 
-**Overview**
+## Overview
+This repository contains a modular, end-to-end Machine Learning pipeline designed to perform Named Entity Recognition (NER) and map extracted entities into a directed Knowledge Graph. 
 
-This is an open-source Python project that implements a deep learning model for 
-entity recognition, where entities are recognized based on their characteristics. The 
-goal of this project is to develop a robust and accurate entity recognition system 
-that can be used in various applications such as natural language processing, 
-information retrieval, and chatbots.
+Built as a foundational AI engineering project ahead of formal computer science coursework at Spokane Falls Community College, this architecture emphasizes Separation of Concerns, object-oriented programming, and strict memory discipline for CPU-bound environments.
 
-**Getting Started**
+## Features
+* **Modular Architecture:** Code is strictly separated by function (Data Ingestion, Model Brain, Execution, Graphing).
+* **Sub-word Token Alignment:** Custom PyTorch `Dataset` logic handles Hugging Face tokenizer sub-word splitting without crashing label alignments.
+* **Knowledge Graph Generation:** Uses `NetworkX` to draw relationships between extracted entities and exports the mathematical structure to JSON.
+* **Hardware Optimized:** Specifically configured to run inference and micro-batch training on CPU-only Linux terminal environments (e.g., Chromebook/Celeron).
 
-To get started with this project, you will need:
+## File Structure
+```text
+entity_recognition/
+├── main.py                # The Orchestrator: Initializes modules and runs the pipeline
+├── config.py              # The Control Center: Global variables, paths, and hyperparameters
+├── entities.py            # The Blueprint: Enums and Dataclasses for strict type-safety
+├── entity_dataset.py      # The Data Loader: PyTorch Dataset for JSON ingestion and token alignment
+├── model.py               # The Brain: PyTorch model initialization, training step, and inference
+├── knowledge_graph.py     # The Mapper: NetworkX directed graph builder and JSON exporter
+├── data/                  # Standardized 80/10/10 split directories
+│   ├── train/dataset.json
+│   ├── validation/dataset.json
+│   └── test/dataset.json
 
-* Python 3.x
-* PyTorch 1.10 or later
-* NLTK 3.x or later (for text preprocessing)
-* pandas 1.x or later (for data manipulation)
+## Contributing
 
-You can install the required packages using pip:
-```bash
-pip install torch torchvision nltk pandas
-```
-**Code Structure**
+This project is open-source and welcomes contributions. Whether you are fixing a bug, adding a new feature, or optimizing the graph extraction logic, your help is appreciated.
 
-The code is organized into several modules:
+To contribute:
+1. **Fork** the repository to your own GitHub account.
+2. **Clone** your fork locally.
+3. **Create a new branch** for your feature or bug fix (`git checkout -b feature/your-feature-name`).
+4. **Commit** your changes with clear, descriptive messages (`git commit -m "Add relation extraction logic"`).
+5. **Push** the branch to your fork (`git push origin feature/your-feature-name`).
+6. **Open a Pull Request (PR)** back to the `main` branch of this original repository.
 
-* `entity_dataset.py`: A custom dataset class that loads and preprocesses data for 
-training and testing the entity recognition model.
-* `model.py`: The main module for defining and training the entity recognition model 
-using PyTorch.
-* `knowledge_graph.py`: A module that defines a knowledge graph data structure to 
-store information about entities and their relationships.
-* `entities.py`: A module that contains functions and classes for working with 
-entities, such as loading entity names and their corresponding IDs.
+Please ensure your code aligns with the existing modular structure and does not break the memory-optimized hyperparameter constraints in `config.py`.
 
-**Model Architecture**
+## License
 
-The entity recognition model is based on the BERT (Bidirectional Encoder 
-Representations from Transformers) architecture. The input text is first preprocessed 
-using NLTK and then passed through a series of layers to produce a sequence 
-representation of the input text. The output is then passed through a final layer to 
-generate predictions.
+This project is licensed under the [MIT License](LICENSE). 
 
-**Training**
-
-To train the model, you will need to create a custom dataset class that loads and 
-preprocesses data for training and testing. You can use the `entity_dataset.py` 
-module to load your own dataset or download pre-trained datasets from the Hugging 
-Face Transformers library.
-```python
-import torch.utils.data as data
-
-class EntityDataset(data.Dataset):
-    def __init__(self, data):
-        self.data = pd.DataFrame(data)
-
-    def __getitem__(self, idx):
-        return self.data.iloc[idx]
-
-    def __len__(self):
-        return len(self.data)
-```
-**Hyperparameters**
-
-The hyperparameters for training the model can be tuned using a grid search or random 
-search approach. You can use the `config.py` module to define and load your custom 
-configuration file.
-```python
-import torch
-
-class EntityConfig:
-    def __init__(self):
-        self.batch_size = 32
-        self.num_epochs = 5
-        self.learning_rate = 0.001
-```
-**Usage**
-
-To use the entity recognition model, you can create an instance of the 
-`EntityDataset` class and pass in your dataset to train the model.
-```python
-model = EntityModel()
-dataset = EntityDataset(data)
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-for epoch in range(5):
-    for batch in dataset:
-        # Train the model on each batch
-        optimizer.zero_grad()
-        outputs = model(batch["input_text"], batch["entities"])
-        loss = criterion(outputs, batch["target_label"])
-        loss.backward()
-        optimizer.step()
-```
-**Contributing**
-
-If you'd like to contribute to this project, please submit a pull request with your 
-changes. You can find the repository on GitHub: 
-[https://github.com/username/entity_recognition](https://github.com/username/entity_re[https://github.com/username/entity_reognition](https://github.com/username/entity_recognition).
-
-Remember to follow the standard guidelines for contributing to open-source projects 
-and to include any necessary licenses or attribution information.
-
-**License**
-
-This project is licensed under the MIT License, which can be found in the LICENSE 
-file.
-
->>> Send a message (/? for help)
+You are free to use, modify, and distribute this software for personal or commercial purposes, provided that the original copyright notice and permission notice are included in all copies or substantial portions of the software.
