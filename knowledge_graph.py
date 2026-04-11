@@ -1,5 +1,6 @@
 # knowledge_graph.py
 
+import os
 import networkx as nx
 import json
 
@@ -40,10 +41,15 @@ class GraphBuilder:
         # node_link_data converts the complex Python graph object into a standard dictionary
         graph_data = nx.node_link_data(self.graph)
         
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(graph_data, f, indent=4)
-            
-        print(f"Graph successfully exported to {filepath}")
+        try:
+            dir_name = os.path.dirname(filepath)
+            if dir_name:
+                os.makedirs(dir_name, exist_ok=True)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(graph_data, f, indent=4)
+            print(f"Graph successfully exported to {filepath}")
+        except OSError as e:
+            print(f"[!] Error exporting graph to '{filepath}': {e}")
 
 # --- Example of how the class operates ---
 if __name__ == "__main__":

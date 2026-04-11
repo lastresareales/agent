@@ -3,6 +3,8 @@
 import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
+from entities import ExtractedEntity
+
 class EntityRecognitionModel:
     def __init__(self, model_name="dslim/bert-base-NER", num_labels=None):
         """
@@ -43,14 +45,14 @@ class EntityRecognitionModel:
         outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
         loss = outputs.loss
         
-        # 4. Backward pass: calculate the gradients
+        # 4. Clear the gradients from the previous step
+        optimizer.zero_grad()
+        
+        # 5. Backward pass: calculate the gradients
         loss.backward()
         
-        # 5. Update the model's weights
+        # 6. Update the model's weights
         optimizer.step()
-        
-        # 6. Clear the gradients for the next batch
-        optimizer.zero_grad()
         
         return loss.item()
 
@@ -75,4 +77,24 @@ class EntityRecognitionModel:
         tokens = self.tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
         predictions = [self.model.config.id2label[idx.item()] for idx in predicted_class_indices[0]]
         
-        return list(zip(tokens, predictions))
+        # Merge sub-word tokens back into whole words and filter special tokens.
+        # Sub-word continuations start with "##"; special tokens like [CLS] and [SEP]
+        # are skipped entirely. The label of the first sub-word piece is used for the word.
+        results = []
+        current_word = None
+        current_label = None
+        for token, label in zip(tokens, predictions):
+            if token in (self.tokenizer.cls_token, self.tokenizer.sep_token, self.tokenizer.pad_token):
+                continue
+            if token.startswith("##"):
+                if current_word is not None:
+                    current_word += token[2:]
+            else:
+                if current_word is not None:
+                    results.append(ExtractedEntity(word=current_word, label=current_label))
+                current_word = token
+                current_label = label
+        if current_word is not None:
+            results.append(ExtractedEntity(word=current_word, label=current_label))
+        
+        return results
