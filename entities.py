@@ -27,6 +27,9 @@ class ExtractedEntity:
     """
     word: str
     label: str
+    start: int | None = None
+    end: int | None = None
+    confidence: float | None = None
     
     # An optional method to print the data cleanly
     def __str__(self):

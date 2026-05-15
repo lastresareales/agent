@@ -10,10 +10,109 @@ Built as a foundational AI engineering project ahead of formal computer science 
 * **Sub-word Token Alignment:** Custom PyTorch `Dataset` logic handles Hugging Face tokenizer sub-word splitting without crashing label alignments.
 * **Knowledge Graph Generation:** Uses `NetworkX` to draw relationships between extracted entities and exports the mathematical structure to JSON.
 * **Hardware Optimized:** Specifically configured to run inference and micro-batch training on CPU-only Linux terminal environments (e.g., Chromebook/Celeron).
+* **Vite Frontend:** React interface for inspecting sample entity extraction and knowledge graph relationships.
+
+## Frontend Quick Start
+```bash
+npm install
+python3 -m pip install -r requirements.txt
+npm run dev:api
+```
+
+In a second terminal:
+
+```bash
+npm run dev
+```
+
+The Vite app starts at the URL printed by the dev server, usually `http://localhost:5173/`.
+The API runs on `http://localhost:8000/` and exposes:
+
+* `GET /api/health`
+* `POST /api/extract` with JSON body `{"text": "Linus Torvalds created Linux in Helsinki."}`
+* `POST /api/chat` with JSON body `{"message": "What do you remember about Linux?"}`
+* `POST /api/learn-url` with JSON body `{"url": "https://example.com/article"}`
+* `GET /api/memory?query=Linux&limit=10`
+
+Test the API with curl:
+
+```bash
+curl http://localhost:8000/api/health
+curl -X POST http://localhost:8000/api/extract \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Linus Torvalds created Linux in Helsinki."}'
+```
+
+By default, the API uses a deterministic fallback extractor so the app responds quickly during local setup.
+To opt into the BERT NER model from `model.py`, start the API with:
+
+```bash
+ENTITY_RECOGNITION_USE_MODEL=1 npm run dev:api
+```
+
+## Autonomous Memory
+The API learns graph facts from every extraction by default and stores them in a local SQLite database at `memory.sqlite3`.
+It also stores raw chat messages as conversation memory, so the assistant can remember preferences, project goals, names, and things that do not fit cleanly into entity relationships.
+This gives the project persistent memory without retraining model weights on every message.
+
+Disable automatic memory writes with:
+
+```bash
+ENTITY_RECOGNITION_AUTO_LEARN=0 npm run dev:api
+```
+
+Use a custom memory database path with:
+
+```bash
+ENTITY_RECOGNITION_MEMORY_DB=data/memory.sqlite3 npm run dev:api
+```
+
+Learn from a web page you provide:
+
+```bash
+curl -X POST http://localhost:8000/api/learn-url \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com/article"}'
+```
+
+The URL learner stores the page text as raw memory and runs entity extraction over the first chunk of readable text.
+
+## Ollama Chat
+The chat endpoint uses Ollama when a local Ollama server is available, then falls back to the built-in rule responder if Ollama is offline.
+
+Install Ollama, pull a small model, and start the API:
+
+```bash
+ollama pull llama3.2:3b
+ENTITY_RECOGNITION_USE_MODEL=1 npm run dev:api
+```
+
+Use a different Ollama model or host with:
+
+```bash
+ENTITY_RECOGNITION_OLLAMA_MODEL=mistral npm run dev:api
+ENTITY_RECOGNITION_OLLAMA_URL=http://127.0.0.1:11434 npm run dev:api
+```
+
+## Python Dependencies
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+## Python Pipeline
+```bash
+python main.py
+```
 
 ## File Structure
 ```text
 entity_recognition/
+├── index.html             # Vite HTML entrypoint
+├── package.json           # Frontend scripts and dependencies
+├── vite.config.js         # Vite React configuration
+├── src/                   # React frontend
+├── api.py                 # FastAPI app used by the frontend
+├── recognition_service.py # Shared extraction and graph response service
 ├── main.py                # The Orchestrator: Initializes modules and runs the pipeline
 ├── config.py              # The Control Center: Global variables, paths, and hyperparameters
 ├── entities.py            # The Blueprint: Enums and Dataclasses for strict type-safety
@@ -24,6 +123,7 @@ entity_recognition/
 │   ├── train/dataset.json
 │   ├── validation/dataset.json
 │   └── test/dataset.json
+```
 
 ## Contributing
 

@@ -1,7 +1,7 @@
 # model.py
 
 import torch
-from transformers import AutoModelForTokenClassification, AutoTokenizer
+from transformers import AutoModelForTokenClassification, AutoTokenizer, pipeline
 
 from entities import ExtractedEntity
 
@@ -28,6 +28,14 @@ class EntityRecognitionModel:
             
         # Push the model to the available hardware (CPU or GPU)
         self.model.to(self.device)
+        pipeline_device = 0 if self.device.type == "cuda" else -1
+        self.ner_pipeline = pipeline(
+            "token-classification",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            aggregation_strategy="simple",
+            device=pipeline_device,
+        )
 
     def train_step(self, batch, optimizer):
         """
@@ -60,41 +68,14 @@ class EntityRecognitionModel:
         """
         Runs inference on a new string of text to predict entities.
         """
-        # Put the model in evaluation mode (disables dropout for consistent results)
-        self.model.eval()
-        
-        # Tokenize and push to hardware
-        inputs = self.tokenizer(text, return_tensors="pt")
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        
-        # Disable gradient tracking for inference to save memory
-        with torch.no_grad():
-            outputs = self.model(**inputs)
-        
-        logits = outputs.logits
-        predicted_class_indices = torch.argmax(logits, dim=2)
-        
-        tokens = self.tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
-        predictions = [self.model.config.id2label[idx.item()] for idx in predicted_class_indices[0]]
-        
-        # Merge sub-word tokens back into whole words and filter special tokens.
-        # Sub-word continuations start with "##"; special tokens like [CLS] and [SEP]
-        # are skipped entirely. The label of the first sub-word piece is used for the word.
-        results = []
-        current_word = None
-        current_label = None
-        for token, label in zip(tokens, predictions):
-            if token in (self.tokenizer.cls_token, self.tokenizer.sep_token, self.tokenizer.pad_token):
-                continue
-            if token.startswith("##"):
-                if current_word is not None:
-                    current_word += token[2:]
-            else:
-                if current_word is not None:
-                    results.append(ExtractedEntity(word=current_word, label=current_label))
-                current_word = token
-                current_label = label
-        if current_word is not None:
-            results.append(ExtractedEntity(word=current_word, label=current_label))
-        
-        return results
+        grouped_entities = self.ner_pipeline(text)
+        return [
+            ExtractedEntity(
+                word=entity["word"],
+                label=entity.get("entity_group", entity.get("entity", "")),
+                start=entity.get("start"),
+                end=entity.get("end"),
+                confidence=float(entity["score"]) if "score" in entity else None,
+            )
+            for entity in grouped_entities
+        ]
